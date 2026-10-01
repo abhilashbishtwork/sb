@@ -21,8 +21,8 @@
   var EXEC = 'https://script.google.com/macros/s/AKfycbyV_WeWKZEp6kFa9msi1ChNCLMll3IqkdejMtuZkHAs69bSt49_AqCz1MO7hpML9B3uSQ/exec';
   var KEYS = ['sbAuth', 'sbBoot2', 'sbToday'];
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  var tok = get('sbAuth') || '';
-  document.getElementById('app').src = EXEC + '?wt=1' + (tok ? '&t=' + encodeURIComponent(tok) : '');
+  // the login is handed to the app by postMessage (sbGet below), never in the URL
+  document.getElementById('app').src = EXEC + '?wt=1';
   window.addEventListener('message', function (e) {
     if (!/^https:\/\/[a-z0-9-]+\.googleusercontent\.com$/.test(e.origin)) return;
     var d = e.data || {};
