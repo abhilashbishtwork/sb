@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="SB RM">
+<title>Sharief Bhai</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; }
+  iframe { border: 0; width: 100%; height: 100%; display: block; }
+</style>
+</head>
+<body>
+<!-- SB RM App wrapper: keeps the login in this page's own (first-party) storage, which phones don't wipe,
+     and passes it to the Apps Script app inside the frame. Only these keys are ever stored. -->
+<iframe id="app" title="Sharief Bhai" allow="camera *; geolocation *; clipboard-write *"></iframe>
+<script>
+  var EXEC = 'https://script.google.com/macros/s/AKfycbyV_WeWKZEp6kFa9msi1ChNCLMll3IqkdejMtuZkHAs69bSt49_AqCz1MO7hpML9B3uSQ/exec';
+  var KEYS = ['sbAuth', 'sbBoot2', 'sbToday'];
+  function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  var tok = get('sbAuth') || '';
+  document.getElementById('app').src = EXEC + '?wt=1' + (tok ? '&t=' + encodeURIComponent(tok) : '');
+  window.addEventListener('message', function (e) {
+    if (!/^https:\/\/[a-z0-9-]+\.googleusercontent\.com$/.test(e.origin)) return;
+    var d = e.data || {};
+    if (d.sbSet && KEYS.indexOf(d.sbSet[0]) >= 0) {
+      try { if (d.sbSet[1] === null) localStorage.removeItem(d.sbSet[0]); else localStorage.setItem(d.sbSet[0], d.sbSet[1]); } catch (x) {}
+    }
+    if (d.sbGet) {
+      var out = {};
+      d.sbGet.forEach(function (k) { if (KEYS.indexOf(k) >= 0) out[k] = get(k); });
+      e.source.postMessage({ sbVals: out }, e.origin);
+    }
+  });
+</script>
+</body>
+</html>
