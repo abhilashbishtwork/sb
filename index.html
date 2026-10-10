@@ -46,7 +46,8 @@
     if (!mine) return;
     var d = e.data; if (!d || typeof d !== 'object') return;
     if (Array.isArray(d.sbSet) && KEYS.indexOf(d.sbSet[0]) >= 0 && (d.sbSet[1] === null || typeof d.sbSet[1] === 'string')) {
-      try { if (d.sbSet[1] === null) localStorage.removeItem(d.sbSet[0]); else localStorage.setItem(d.sbSet[0], d.sbSet[1]); } catch (x) {}
+      // a refused save (storage full) removes the old copy — it used to survive silently and the app booted from it days later
+      try { if (d.sbSet[1] === null) localStorage.removeItem(d.sbSet[0]); else localStorage.setItem(d.sbSet[0], d.sbSet[1]); } catch (x) { try { localStorage.removeItem(d.sbSet[0]); } catch (y) {} }
     }
     if (Array.isArray(d.sbGet)) { setTimeout(hideSplash, 150);
       var out = {};
