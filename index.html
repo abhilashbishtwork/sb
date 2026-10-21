@@ -38,6 +38,7 @@
   // hide the splash once the app inside the frame has started (it asks for sbGet on boot); fallback after 8 s
   function hideSplash() { var s = document.getElementById('splash'); if (s) { s.style.opacity = 0; setTimeout(function () { s.remove(); }, 300); } }
   setTimeout(hideSplash, 8000);
+  var lastReload = 0;
   window.addEventListener('message', function (e) {
     // only the Apps Script sandbox frame that lives INSIDE our own iframe may talk to this page
     if (!/^https:\/\/n-[a-z0-9-]+-script\.googleusercontent\.com$/.test(e.origin)) return;
@@ -49,6 +50,8 @@
       // a refused save (storage full) removes the old copy — it used to survive silently and the app booted from it days later
       try { if (d.sbSet[1] === null) localStorage.removeItem(d.sbSet[0]); else localStorage.setItem(d.sbSet[0], d.sbSet[1]); } catch (x) { try { localStorage.removeItem(d.sbSet[0]); } catch (y) {} }
     }
+    // a newer app build is live: reload the frame (at most once a minute, so a mismatch can never loop)
+    if (d.sbReload === 1 && Date.now() - lastReload > 60000) { lastReload = Date.now(); var fr = document.getElementById('app'); try { fr.contentWindow.location.replace(EXEC + '?wt=1&v=' + Date.now()); } catch (x) { fr.src = EXEC + '?wt=1&v=' + Date.now(); } return; }
     if (Array.isArray(d.sbGet)) { setTimeout(hideSplash, 150);
       var out = {};
       d.sbGet.forEach(function (k) { if (KEYS.indexOf(k) >= 0) out[k] = get(k); });
